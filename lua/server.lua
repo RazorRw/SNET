@@ -63,8 +63,8 @@ local function get_packet(object)
   if data and address and port then
     local is_block, list_id = is_blacklisted(object, tostring(address))
     if is_block then
-      if os.time() >= object.blacklist[list_id][2] then
-        object.blacklist[list_id][2] = os.time() + 60
+      if socket.gettime() >= object.blacklist[list_id][2] then
+        object.blacklist[list_id][2] = socket.gettime() + 60
         object:send(SNET_BLOCK_PACKET, bstream.new(),
         SNET_BYPASS_PRIORITY, address, port)
       end
@@ -113,7 +113,7 @@ local function receive_packet(object)
       end
     end
   end
-  object.clients[address..':'..port] = os.time()
+  object.clients[address..':'..port] = socket.gettime()
 
   for i, v in ipairs(object.events) do
     if v[1] == 'onReceivePacket' then
@@ -161,7 +161,7 @@ function server:send(packet_id, stream, priority, address, port)
       unique_id = unique_id, packet_id = packet_id,
       priority = priority, bytes = stream.bytes,
       address = address, port = port,
-      times = 0, last_time = os.time()
+      times = 0, last_time = socket.gettime()
     })
   end
 
@@ -171,8 +171,8 @@ end
 local function resend_packets(object)
   for i = #object.packets, 1, -1 do
     local v = object.packets[i]
-    if os.time() ~= v.last_time then
-      v.last_time = os.time()
+    if socket.gettime() ~= v.last_time then
+      v.last_time = socket.gettime()
       v.times = v.times + 1
 
       send_packet(object, v.unique_id, v.packet_id,
@@ -191,7 +191,7 @@ end
 function server:process()
   receive_packet(self)
   for k, v in pairs(self.clients) do
-    if os.time() - v >= 60 then
+    if socket.gettime() - v >= 60 then
       self.clients[k] = nil
       self.last_ids[k] = nil
       for i, vv in ipairs(self.events) do

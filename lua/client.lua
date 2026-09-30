@@ -95,7 +95,7 @@ function client:send(packet_id, stream, priority)
     table.insert(self.packets, {
       unique_id = unique_id, packet_id = packet_id,
       priority = priority, bytes = stream.bytes,
-      times = 0, last_time = os.time()
+      times = 0, last_time = socket.gettime()
     })
   end
 
@@ -105,8 +105,8 @@ end
 local function resend_packets(object)
   for i = #object.packets, 1, -1 do
     local v = object.packets[i]
-    if os.time() ~= v.last_time then
-      v.last_time = os.time()
+    if socket.gettime() ~= v.last_time then
+      v.last_time = socket.gettime()
       v.times = v.times + 1
 
       send_packet(object, v.unique_id, v.packet_id, v.priority, v.bytes)
