@@ -10,6 +10,8 @@ server.clients = {}
 server.packets = {}
 server.blacklist = {}
 
+local RESEND_INTERVAL = 1.0
+
 function server:add_event_handler(event, callback)
   table.insert(self.events, {event, callback})
 end
@@ -174,7 +176,7 @@ end
 local function resend_packets(object)
   for i = #object.packets, 1, -1 do
     local v = object.packets[i]
-    if socket.gettime() ~= v.last_time then
+    if socket.gettime() - v.last_time > RESEND_INTERVAL then
       v.last_time = socket.gettime()
       v.times = v.times + 1
 
