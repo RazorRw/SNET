@@ -148,7 +148,7 @@ local function send_packet(object, unique_id, packet_id, priority, bytes, addres
   data:write(BS_UINT32, packet_id)
   data:write(BS_UINT8, priority)
 
-  return object.socket:sendto('\0' .. data.bytes .. '\0', address, port)
+  return object.socket:sendto('\0' .. data.bytes, address, port)
 end
 
 function server:send(packet_id, stream, priority, address, port)

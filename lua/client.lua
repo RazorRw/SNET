@@ -83,7 +83,7 @@ local function send_packet(object, unique_id, packet_id, priority, bytes)
   data:write(BS_UINT32, packet_id)
   data:write(BS_UINT8, priority)
 
-  return object.socket:send('\0' .. data.bytes .. '\0')
+  return object.socket:send('\0' .. data.bytes)
 end
 
 function client:send(packet_id, stream, priority)
