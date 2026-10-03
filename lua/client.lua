@@ -16,6 +16,7 @@ end
 local function get_packet(object)
   local data = object.socket:receive()
   if data then
+    if #data < 1 or data:byte(1) ~= 0x0 then return false end -- Empty packet fix.
     if data:sub(1, 1):byte() ~= 0x0 then return false end
     data = data:sub(2, #data)
     return data
@@ -26,6 +27,8 @@ end
 local function receive_packet(object)
   local data = get_packet(object)
   if not data then return false end
+   -- If the data is less than 9 bytes, sub will return an empty string
+  if #data < 9 then return false end
 
   local clean_data = data:sub(10, #data)
   data = bstream.new(data)
